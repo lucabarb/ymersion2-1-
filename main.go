@@ -5,11 +5,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"strings"
 )
 
 func main() {
-
 	temp, err := template.ParseGlob("./templates/*.html")
 	if err != nil {
 		fmt.Printf(fmt.Sprintf("ERREUR => %s", err.Error()))
@@ -21,6 +19,10 @@ func main() {
 	})
 
 	http.HandleFunc("/code/treatment", func(w http.ResponseWriter, r *http.Request) {
+		// Utilisez r.FormValue("input") pour récupérer la valeur du formulaire
+		input := r.FormValue("input")
+		result := decode(input)
+		fmt.Fprintf(w, "Résultat : %s", result)
 	})
 
 	rootDoc, _ := os.Getwd()
@@ -29,14 +31,24 @@ func main() {
 	fmt.Println("Serveur démarré sur le port 8080...")
 	http.ListenAndServe("localhost:8080", nil)
 }
-func addTwo(str string) string {
-	var res strings.Builder
-	for _, c := range str {
-		newChar := c + 2
-		if newChar > 'z' {
-			newChar = newChar - 26
+
+func decode(input string) string {
+	decode := make([]byte, len(input))
+
+	for i := 0; i < len(input); i++ {
+		char := input[i]
+		decodeChar := char
+
+		if char >= 'A' && char <= 'Z' {
+			decodeChar = (char-'A'-2+26)%26 + 'A'
 		}
-		res.WriteRune(newChar)
+
+		if char >= 'a' && char <= 'z' {
+			decodeChar = (char-'a'-2+26)%26 + 'a'
+		}
+
+		decode[i] = decodeChar
 	}
-	return res.String()
+
+	return string(decode)
 }
