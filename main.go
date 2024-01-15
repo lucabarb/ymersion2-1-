@@ -28,3 +28,14 @@ func main() {
 	fmt.Println("Serveur démarré sur le port 8080...")
 	http.ListenAndServe("localhost:8080", nil)
 }
+func addTwo(str string) string {
+	var res strings.Builder
+	for _, c := range str {
+		newChar := c + 2
+		if newChar > 'z' {
+			newChar = newChar - 26
+		}
+		res.WriteRune(newChar)
+	}
+	return res.String()
+}
